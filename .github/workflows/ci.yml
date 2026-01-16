@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./cli
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: 'cli/go.mod'
+
+    - name: Install Dependencies
+      run: go mod download
+
+    - name: Run Tests
+      run: make test
+
+    - name: Build
+      run: make build
