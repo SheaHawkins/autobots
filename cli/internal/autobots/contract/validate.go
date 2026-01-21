@@ -240,7 +240,7 @@ func validateBindings(b *ContractBindings, assertionIDs AssertionIDSet, errs *Va
 			errs.Add(prefix+".path", "required")
 		}
 
-		// covers must reference existing assertions
+		// covers must reference existing assertions 
 		for j, aid := range t.Covers {
 			if _, ok := assertionIDs[aid]; !ok {
 				errs.Addf(fmt.Sprintf("%s.covers[%d]", prefix, j), "unknown assertion id '%s'", aid)

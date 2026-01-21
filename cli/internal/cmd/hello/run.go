@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SheaHawkins/AutoBots/internal/cmd/shared"
+	"github.com/SheaHawkins/autobots/internal/cmd/shared"
 )
 
 func Run(ctx context.Context, deps shared.Dependencies, flags *Flags, args []string) error {
@@ -17,6 +17,6 @@ func Run(ctx context.Context, deps shared.Dependencies, flags *Flags, args []str
 		fmt.Println("Running in verbose mode...")
 	}
 
-	fmt.Printf("Hello, %s! Welcome to AutoBots.\n", name)
+	fmt.Printf("Hello, %s! Welcome to autobots.\n", name)
 	return nil
 }

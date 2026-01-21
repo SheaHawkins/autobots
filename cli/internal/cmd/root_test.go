@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/SheaHawkins/AutoBots/internal/cmd/shared"
+	"github.com/SheaHawkins/autobots/internal/cmd/shared"
 	"github.com/stretchr/testify/assert"
 )
 
