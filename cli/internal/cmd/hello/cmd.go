@@ -1,7 +1,7 @@
 package hello
 
 import (
-	"github.com/SheaHawkins/AutoBots/internal/cmd/shared"
+	"github.com/SheaHawkins/autobots/internal/cmd/shared"
 	"github.com/spf13/cobra"
 )
 

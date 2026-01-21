@@ -5,19 +5,13 @@ import (
 	"time"
 )
 
-// BenchmarkValidateContract is the idiomatic Go way to measure performance.
 // Run this with: go test -bench=. -benchmem
 func BenchmarkValidateContract(b *testing.B) {
-	// Setup a clean contract once
 	c := getPerfContract()
 
-	// Reset timer to ignore setup costs
 	b.ResetTimer()
 
-	// The loop that Go's testing tool controls
 	for i := 0; i < b.N; i++ {
-		// We ignore the error because we are profiling the *cost* of the check,
-		// not correctness (which is covered in unit tests).
 		_ = ValidateContract(c)
 	}
 }
@@ -28,10 +22,8 @@ func BenchmarkValidateContract(b *testing.B) {
 func TestValidationLatency(t *testing.T) {
 	c := getPerfContract()
 
-	// We run the validation N times to average out OS scheduler noise.
-	// A single run is too fast to measure reliably (nanoseconds).
 	iterations := 5000
-	threshold := 500 * time.Microsecond // 0.5ms per validation (extremely generous buffer)
+	threshold := 500 * time.Microsecond
 
 	start := time.Now()
 	for i := 0; i < iterations; i++ {
@@ -51,7 +43,6 @@ func TestValidationLatency(t *testing.T) {
 	}
 }
 
-// Helper to generate a slightly complex contract to simulate real load
 func getPerfContract() *Contract {
 	return &Contract{
 		APIVersion: "autobots/v1alpha1",

@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/SheaHawkins/AutoBots/internal/cmd/hello"
-	"github.com/SheaHawkins/AutoBots/internal/cmd/shared"
+	"github.com/SheaHawkins/autobots/internal/cmd/hello"
+	"github.com/SheaHawkins/autobots/internal/cmd/shared"
 	"github.com/spf13/cobra"
 )
 
@@ -12,8 +12,8 @@ func NewRoot(deps shared.Dependencies) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "autobots",
 		Version:      Version,
-		Short:        "AutoBots - agents that know the rules of the road.",
-		Long:         `AutoBots is an AI-powered platform automating the long and boring tasks of software.`,
+		Short:        "autobots - agents that know the rules of software.",
+		Long:         `autobots is an AI-powered platform automating the long and boring tasks of software.`,
 		SilenceUsage: true,
 	}
 

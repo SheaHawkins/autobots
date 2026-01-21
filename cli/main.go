@@ -6,8 +6,8 @@ package main
 import (
 	"os"
 
-	"github.com/SheaHawkins/AutoBots/internal/cmd"
-	"github.com/SheaHawkins/AutoBots/internal/cmd/shared"
+	"github.com/SheaHawkins/autobots/internal/cmd"
+	"github.com/SheaHawkins/autobots/internal/cmd/shared"
 )
 
 func main() {

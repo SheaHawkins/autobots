@@ -1,4 +1,4 @@
-module github.com/SheaHawkins/AutoBots
+module github.com/SheaHawkins/autobots
 
 go 1.25
 

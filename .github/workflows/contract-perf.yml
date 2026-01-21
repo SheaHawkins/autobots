@@ -3,36 +3,107 @@ name: Contract Performance
 on:
   pull_request:
     paths:
-      - 'cli/internal/autobots/contract/**'
-  workflow_dispatch: # Allows manual triggering if needed
+      - 'contract/**'
+
+permissions:
+  contents: read
+  pull-requests: write # Required to post comments
 
 jobs:
-  benchmark:
-    name: Validate Performance
+  benchmark-compare:
+    name: Compare Performance
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./cli
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.23' # Ensure this matches your project
+          check-latest: true
 
-      - name: Run Latency SLA Test
-        run: |
-          go test ./internal/autobots/contract -v -run TestValidationLatency
+      - name: Install Benchstat
+        run: go install golang.org/x/perf/cmd/benchstat@latest
 
-      - name: Run Benchmarks & Report
+      # ----------------------------------------------------------------
+      # 1. Benchmark BASE (Main Branch)
+      # ----------------------------------------------------------------
+      - name: Checkout Base (Main)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          path: base-src
+
+      - name: Run Benchmark on Base
+        working-directory: base-src/contract
         run: |
-          echo "## 📊 Contract Validation Benchmark" >> $GITHUB_STEP_SUMMARY
-          echo "Run on: $(date)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`text" >> $GITHUB_STEP_SUMMARY
+          go test -bench=. -benchmem -count=5 -run=^$ > ../../base.txt
+        # count=5 runs it 5 times for statistical significance (required for accurate % diff)
+
+      # ----------------------------------------------------------------
+      # 2. Benchmark HEAD (Current PR)
+      # ----------------------------------------------------------------
+      - name: Checkout Head (PR)
+        uses: actions/checkout@v4
+        with:
+          path: head-src
+
+      - name: Run Benchmark on Head
+        working-directory: head-src/contract
+        run: |
+          go test -bench=. -benchmem -count=5 -run=^$ > ../../head.txt
+
+      # ----------------------------------------------------------------
+      # 3. Compare & Comment
+      # ----------------------------------------------------------------
+      - name: Generate Comparison Report
+        id: benchstat
+        run: |
+          # Use benchstat to compare base vs head
+          OUTPUT=$(benchstat base.txt head.txt)
           
-          go test ./internal/autobots/contract -bench=. -benchmem -run=^$ >> $GITHUB_STEP_SUMMARY
+          # Print to console for logs
+          echo "$OUTPUT"
           
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          # Save to a file for the comment step, wrapping in a code block
+          echo "## ⚡ Contract Validation Performance Report" > comment.md
+          echo "" >> comment.md
+          echo "\`\`\`text" >> comment.md
+          echo "$OUTPUT" >> comment.md
+          echo "\`\`\`" >> comment.md
+
+      - name: Post Comment on PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('comment.md', 'utf8');
+            
+            // 1. Get existing comments
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            // 2. Find if we already posted a perf report (to update instead of spamming)
+            const botComment = comments.find(c => 
+              c.user.type === 'Bot' && 
+              c.body.includes('Contract Validation Performance Report')
+            );
+
+            // 3. Update or Create
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
