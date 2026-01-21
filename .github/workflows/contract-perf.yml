@@ -36,7 +36,7 @@ jobs:
         working-directory: base-src/cli/internal/autobots/contract
         # FIX: Output to ${{ github.workspace }}/base.txt so it is always at the root
         run: |
-          go test -bench=. -benchmem -count=5 -run=^$ > ${{ github.workspace }}/base.txt
+          go test -bench=. -benchmem -count=6 -run=^$ > ${{ github.workspace }}/base.txt
 
       # ----------------------------------------------------------------
       # 2. Benchmark HEAD (Current PR)
@@ -50,7 +50,7 @@ jobs:
         working-directory: head-src/cli/internal/autobots/contract
         # FIX: Output to ${{ github.workspace }}/head.txt
         run: |
-          go test -bench=. -benchmem -count=5 -run=^$ > ${{ github.workspace }}/head.txt
+          go test -bench=. -benchmem -count=6 -run=^$ > ${{ github.workspace }}/head.txt
 
       # ----------------------------------------------------------------
       # 3. Compare & Comment
