@@ -1,0 +1,41 @@
+apiVersion: autobots/v1alpha1
+kind: Contract
+metadata:
+  is_draft: true
+  labels:
+    domain: billing
+    surface: http
+spec:
+  consumer:
+    component: ui-web
+  provider:
+    component: billing-api
+  surface:
+    kind: http
+    http:
+      method: POST
+      path: /v1/invoices/{invoiceId}/mark-paid
+      auth:
+        scheme: bearer
+        scopes: [invoices:write]
+  assertions:
+    - id: A-1
+      text: "Marking an invoice paid returns 200 and the returned invoice has status=PAID."
+    - id: A-2
+      text: "Response includes id, updatedAt, status, and balance=0."
+    - id: A-3
+      text: "Calling mark-paid on an already paid invoice is idempotent and returns 200."
+    - id: A-4
+      text: "The invoices table has no rows where status=PAID and balance != 0."
+  bindings:
+    tests:
+      - id: T-1
+        kind: postman
+        path: tests/postman/collection.json
+        required: true
+        covers: [A-1, A-2, A-3]
+      - id: T-2
+        kind: sql
+        path: tests/sql/checks.sql
+        required: false
+        covers: [A-4]
