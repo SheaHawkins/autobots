@@ -1,0 +1,28 @@
+apiVersion: autobots/v1alpha1
+kind: Contract
+metadata:
+  is_draft: true
+  labels: {}
+spec:
+  consumer:
+    component: ""
+  provider:
+    component: ""
+  surface:
+    kind: http
+    http:
+      method: ""
+      path: ""
+      auth:
+        scheme: ""
+        scopes: []
+  assertions:
+    - id: A-1
+      text: ""
+  bindings:
+    tests:
+      - id: T-1
+        kind: postman
+        path: ""
+        required: true
+        covers: [A-1]
